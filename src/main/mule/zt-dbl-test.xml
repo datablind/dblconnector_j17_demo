@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:zt="http://www.mulesoft.org/schema/mule/zt"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/zt http://www.mulesoft.org/schema/mule/zt/current/mule-zt.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="blindJSON" doc:id="37cb1b0f-4957-4fc4-b989-96aa55c02392" >
+		<http:listener doc:name="Listener" doc:id="075ebd7d-1595-457d-9e35-bd9aea6c0c4b" config-ref="HTTP_Listener_config" path="/blindJSON"/>
+		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="efc09481-f20b-4732-9ec1-bcff715cf175" variableName="tweak" />
+		<zt:encrypt-json doc:name="Encrypt json" doc:id="1c42124b-8fe1-4687-b561-98728e286cf4" config-ref="DATA_BLIND_Config" sensitiveFields="#[write(payload.SensitiveFields, 'application/json')]"  tweak="#[vars.tweak]">
+			<zt:sensitive-json ><![CDATA[#[write(payload.SensitiveJSON, 'application/json')]]]></zt:sensitive-json>
+		</zt:encrypt-json>
+		<logger level="INFO" doc:name="Logger" doc:id="d9f9640c-b157-4764-a274-8d5e20d88975" message='#["EncryptJson completed"]'/>
+	</flow>
+	<flow name="blindJSON_nlp" doc:id="7f849601-a0d8-418b-a038-69637a004302" >
+		<http:listener doc:name="Listener" doc:id="4036895f-8dbf-4b6c-8d6e-05f5a64a88b5" config-ref="HTTP_Listener_config" path="/blindJSON_nlp" />
+		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="2a28e750-13e0-4206-8679-2bee7ac7d187" variableName="tweak" />
+		<zt:encrypt-json-using-nlp doc:name="Encrypt json using nlp" doc:id="169ae518-5bf9-4580-b7c9-2b5bcb834ca0" config-ref="DATA_BLIND_Config"  tweak="#[vars.tweak]" >
+			<zt:sensitive-json ><![CDATA[#[write(payload.SensitiveJSON, 'application/json')]]]></zt:sensitive-json>
+		</zt:encrypt-json-using-nlp>
+		<ee:transform doc:name="Transform Message" doc:id="4629b091-1740-41db-92a9-b016af2c0429">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+read(payload.token, 'application/json')]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="9cee545b-c3f1-4457-a721-d91814ce2935" message='#["EncryptJsonNlp completed"]' />
+	</flow>
+	<flow name="clearJSON" doc:id="5a84c642-2b1a-4aa1-a63b-931f7e70f272" >
+		<http:listener doc:name="Listener" doc:id="ecffaf8f-2cc8-442c-888b-bd16d4dbc01a" config-ref="HTTP_Listener_config" path="/clearJSON" />
+		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="6d0a0ec6-e418-4b77-8e93-73b648d9a0d2" variableName="tweak" />
+		<zt:decrypt-json doc:name="Decrypt json" doc:id="a2b06d78-e2cb-4f0a-99eb-a9f49fce328c" config-ref="DATA_BLIND_Config" sensitiveFields="#[write(payload.SensitiveFields, 'application/json')]"  tweak="#[vars.tweak]">
+			<zt:encrypted-json ><![CDATA[#[write(payload.SensitiveJSON, 'application/json')]]]></zt:encrypted-json>
+		</zt:decrypt-json>
+		<logger level="INFO" doc:name="Logger" doc:id="e0881cfa-14b4-40f3-818d-0473fd42e1be" message='#["DecryptJson completed"]' />
+	</flow>
+	<flow name="createToken" doc:id="f0f5224f-9abf-4d33-ba6d-f2746470660f" >
+		<http:listener doc:name="Listener" doc:id="3028a779-b6af-416d-ad72-1b94eea987d4" config-ref="HTTP_Listener_config" path="/createToken" />
+		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="09c28e27-640c-4c40-9c8d-c356fcf662d7" variableName="tweak" />
+		<zt:override-token doc:name="Override token" doc:id="e760f035-844a-4325-8d24-9d28d8aebf14" config-ref="DATA_BLIND_Config" passPhrase="#[payload.passPhrase]" expirationSecs="#[payload.expirationSeconds]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="f2596b1e-7c39-4a34-a113-ade8acafe754" message='#["OverRideToken completed"]' />
+	</flow>
+	<flow name="createTokenWithKey" doc:id="7b997c2d-abcf-48a3-a9ff-7556274c8e6d" >
+		<http:listener doc:name="Listener" doc:id="a89c03b2-cf23-473d-ab40-0d841679d423" config-ref="HTTP_Listener_config" path="/createTokenWithKey" />
+		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="a20f5e54-8c61-43bf-9424-8f4481537a90" variableName="tweak" />
+		<zt:override-token-with-new-key doc:name="Override token with new key" doc:id="27979fdd-a3a7-4148-a797-f650379e69e3" key="#[payload.key]" passPhrase="#[payload.passPhrase]" expirationSecs="#[payload.expirationSeconds]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="9e76ec4f-a5ce-4df5-8485-df76aca25625" message='#["OverRideTokenWithKey completed"]' />
+	</flow>
+	<flow name="reduceJSON" doc:id="995e2a6b-140a-41fd-85d4-6ec0e2ae5057" >
+		<http:listener doc:name="Listener" doc:id="63e97d6d-f75c-4838-a555-31f0fd354a76" config-ref="HTTP_Listener_config" path="/reduceJSON" />
+		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="0bcdc8dd-fc39-4283-9916-eccddb99a928" variableName="tweak" />
+		<zt:reduce-json doc:name="Reduce json" doc:id="cc92ee4c-3eb7-4072-8264-03924ec9625a" config-ref="DATA_BLIND_Config" sensitiveFields="#[payload.SensitiveFields]"  operation='#["retain"]'>
+			<zt:sensitive-json ><![CDATA[#[write(payload.SensitiveJSON, 'application/json')]]]></zt:sensitive-json>
+		</zt:reduce-json>
+		<logger level="INFO" doc:name="Logger" doc:id="7ecd2ac7-5c97-46bd-a341-eb622468a720" message='#["ReduceJson completed"]' />
+	</flow>
+</mule>
