@@ -10,7 +10,9 @@
 ## Configuration Requirements:
 
 Encrypt Json NLP operation will require the following Connection parameters:
-  - **API URI**  (Contact dblconnector@ztensor.com)
-  - **DataGuard API Key**   (Contact dblconnector@ztensor.com)
+  - **API URI**  
+  - **DataGuard API Key**  
+
+  Note : Contact dblconnector@ztensor.com for these parameters
 
 
