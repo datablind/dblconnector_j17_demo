@@ -10,6 +10,6 @@ http://www.mulesoft.org/schema/mule/zt http://www.mulesoft.org/schema/mule/zt/cu
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
 	<zt:config name="DATA_BLIND_Config" doc:name="DATA BLIND Config" doc:id="04761b7b-aa36-42e4-a937-f41345e98c58" encryptionKey='#["1234567812345678"]'>
-		<zt:connection/>
+		<zt:connection apiUri="https://kwoz0lfnn8.execute-api.us-west-1.amazonaws.com/Dev" apiKey="hyamCMB55o36G1J0fUXm63I5h3qBmcGl8UZKvLQZ"/>
 	</zt:config>
 </mule>

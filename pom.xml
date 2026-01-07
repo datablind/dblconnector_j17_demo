@@ -4,7 +4,7 @@
 
 	<groupId>com.mycompany</groupId>
 	<artifactId>dblconnector-j17-demo</artifactId>
-	<version>2.0.1</version>
+	<version>2.0.2</version>
 	<packaging>mule-application</packaging>
 
 	<name>dblconnector-j17-demo</name>
@@ -15,7 +15,8 @@
 
 		<app.runtime>4.3.0</app.runtime>
 		<mule.maven.plugin.version>4.3.0</mule.maven.plugin.version>
-		<datablind.exchange.groupId>a79366f6-f351-4a5e-9386-00c7ef207362</datablind.exchange.groupId>
+		<datablind.exchange.groupId>d219686a-b9d2-4cd2-8fd1-3f64ae5a05d4</datablind.exchange.groupId>
+		<munit.version>3.4.0</munit.version>
 	</properties>
 
 	<build>
@@ -34,17 +35,46 @@
 					<additionalPluginDependencies>
 						<plugin>
 							<groupId>${datablind.exchange.groupId}</groupId>
-							<artifactId>DataBlind</artifactId>
+							<artifactId>mule-datablind-connector</artifactId>
 							<additionalDependencies>
 								<dependency>
 									<groupId>com.ztensor</groupId>
 									<artifactId>datacrypt</artifactId>
-									<version>3.0.3</version>
+									<version>3.0.5</version>
 								</dependency>
 							</additionalDependencies>
 						</plugin>
 					</additionalPluginDependencies>
 					<classifier>mule-application</classifier>
+					<sharedLibraries>
+						<sharedLibrary>
+							<groupId>com.ztensor</groupId>
+							<artifactId>datacrypt</artifactId>
+						</sharedLibrary>
+					</sharedLibraries>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.mulesoft.munit.tools</groupId>
+				<artifactId>munit-maven-plugin</artifactId>
+				<version>${munit.version}</version>
+				<executions>
+					<execution>
+						<id>test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>test</goal>
+							<goal>coverage-report</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<coverage>
+						<runCoverage>true</runCoverage>
+						<formats>
+							<format>html</format>
+						</formats>
+					</coverage>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -53,25 +83,73 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-http-connector</artifactId>
-			<version>1.9.0</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.connectors</groupId>
 			<artifactId>mule-sockets-connector</artifactId>
 			<version>1.2.6</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
 			<groupId>${datablind.exchange.groupId}</groupId>
-			<artifactId>DataBlind</artifactId>
-			<version>4.0.24</version>
+			<artifactId>mule-datablind-connector</artifactId>
+			<version>5.0.12</version>
 			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.munit</groupId>
+			<artifactId>munit-runner</artifactId>
+			<version>${munit.version}</version>
+			<classifier>mule-plugin</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.munit</groupId>
+			<artifactId>munit-tools</artifactId>
+			<version>${munit.version}</version>
+			<classifier>mule-plugin</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.weave</groupId>
+			<artifactId>assertions</artifactId>
+			<version>1.2.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-file-connector</artifactId>
+			<version>1.5.2</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-http-connector</artifactId>
+			<version>1.10.3</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.connectors</groupId>
+			<artifactId>mule-mcp-connector</artifactId>
+			<version>1.2.1</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.ztensor</groupId>
+			<artifactId>datacrypt</artifactId>
+			<version>3.0.5</version>
 		</dependency>
 	</dependencies>
 
 	<repositories>
+		<!--	  <repository>
+	  	<id>mulesoft-releases</id>
+		<name>MuleSoft Nexus Release Repository</name>
+		<url>https://repository.mulesoft.org/nexus/content/repositories/releases/</url>
+  	</repository>
+  	<repository>
+		<id>mulesoft-snapshots</id>
+		<name>MuleSoft Nexus Snapshot Repository</name>
+		<url>https://repository.mulesoft.org/nexus/content/repositories/snapshots/</url>
+  	</repository>
+-->
 		<repository>
 			<id>anypoint-exchange-v2</id>
 			<name>Anypoint Exchange</name>
@@ -84,6 +162,12 @@
 			<url>https://repository.mulesoft.org/releases/</url>
 			<layout>default</layout>
 		</repository>
+		<!--  		<repository>
+				   <id>MuleRepository</id>
+				   <name>MuleRepository</name>
+				   <url>https://repository.mulesoft.org/nexus-ee/content/repositories/releases-ee/</url>
+		</repository>
+-->
 		<repository>
 			<id>cwrepo</id>
 			<name>GitHub OWNER Apache Maven Packages</name>

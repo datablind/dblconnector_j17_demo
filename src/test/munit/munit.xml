@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:test name="munitTest" doc:id="999fef68-9545-4b9f-850e-8f5e4c3f59e3" >
+		<munit:behavior >
+			<set-payload value='#[{&#10;    "SensitiveFields" : {&#10;        "accounting.lastName" : "FE:PersonName",&#10;        "accounting.firstName" : "FE:PersonName",&#10;        "accounting.age" : "AES:CBC",&#10;        "phoneNumber" : "FE:PhoneNumber",&#10;        "accountNumber" : "MASK:#"&#10;    },&#10;    "SensitiveJSON" : {&#10; 	    "accounting" : &#10; 		[   &#10; 			{ &#10; 			"firstName" : "John",  &#10; 			"lastName"  : "Doe",&#10; 			"age"       : 23 &#10; 			},&#10;			{&#10;			"firstName" : "Mary",  &#10; 			"lastName"  : "Smith",&#10; 			"age"      : 32 &#10; 			}&#10; 		],                           &#10;	    "sales": &#10;		[ &#10;  			{ &#10;  			"firstName" : "Sally",&#10;  			"lastName"  : "Green",&#10;  			"age"      : 27 &#10; 			}, &#10;  			{ &#10;  			"firstName" : "Jim", &#10;  			"lastName"  : "Galley",&#10;  			"age"       : 41 &#10;  			}&#10;  		],&#10;  	    "companyName" : "First &amp; Best Corporation",&#10;  	    "address" : "Street1, City, State, Country",&#10;  	    "phoneNumber" : "123456789",&#10;        "accountNumber" :  "23873487342"&#10;    }&#10;}]' doc:name="Set Payload" doc:id="98f9fcf9-396b-4f0c-900e-0928f2fc1012" />
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow Reference" doc:id="2ed69314-aac8-42b7-a3f0-5835a7bc6ce5" name="blindJSON"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="46405f5f-89e5-4510-956d-5f5ba8978d23" actual="#[payload]" expected='#[{&#10;    "accounting": [&#10;        {&#10;            "firstName": "Uuxm",&#10;            "lastName": "Ees",&#10;            "age": "DgqjgVvKkfFgVvLGy9j1Eg=="&#10;        },&#10;        {&#10;            "firstName": "Bfei",&#10;            "lastName": "Edmgy",&#10;            "age": "Xc9d8H0uNxj7lvoFXC4OBQ=="&#10;        }&#10;    ],&#10;    "sales": [&#10;        {&#10;            "firstName": "Sally",&#10;            "lastName": "Green",&#10;            "age": 27&#10;        },&#10;        {&#10;            "firstName": "Jim",&#10;            "lastName": "Galley",&#10;            "age": 41&#10;        }&#10;    ],&#10;    "companyName": "First &amp; Best Corporation",&#10;    "address": "Street1, City, State, Country",&#10;    "phoneNumber": "128388658",&#10;    "accountNumber": "###########"&#10;}]' message='#["blindJson Test Success"]'/>
+		</munit:validation>
+	</munit:test>
+</mule>

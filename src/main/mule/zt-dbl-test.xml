@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:zt="http://www.mulesoft.org/schema/mule/zt"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:zt="http://www.mulesoft.org/schema/mule/zt"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/zt http://www.mulesoft.org/schema/mule/zt/current/mule-zt.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
 	<flow name="blindJSON" doc:id="37cb1b0f-4957-4fc4-b989-96aa55c02392" >
 		<http:listener doc:name="Listener" doc:id="075ebd7d-1595-457d-9e35-bd9aea6c0c4b" config-ref="HTTP_Listener_config" path="/blindJSON"/>
 		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="efc09481-f20b-4732-9ec1-bcff715cf175" variableName="tweak" />
-		<zt:encrypt-json doc:name="Encrypt json" doc:id="1c42124b-8fe1-4687-b561-98728e286cf4" config-ref="DATA_BLIND_Config" sensitiveFields="#[write(payload.SensitiveFields, 'application/json')]"  tweak="#[vars.tweak]">
-			<zt:sensitive-json ><![CDATA[#[write(payload.SensitiveJSON, 'application/json')]]]></zt:sensitive-json>
+		<zt:encrypt-json doc:name="Encrypt json" doc:id="7af78e76-4b17-482e-9a00-5f65b044986b" config-ref="DATA_BLIND_Config" sensitiveFields="#[write(payload.SensitiveFields, 'application/json')]" tweak="#[vars.tweak]">
+			<zt:sensitive-json><![CDATA[#[payload.SensitiveJSON]]]></zt:sensitive-json>
 		</zt:encrypt-json>
 		<logger level="INFO" doc:name="Logger" doc:id="d9f9640c-b157-4764-a274-8d5e20d88975" message='#["EncryptJson completed"]'/>
 	</flow>
@@ -20,12 +21,21 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<zt:encrypt-json-using-nlp doc:name="Encrypt json using nlp" doc:id="169ae518-5bf9-4580-b7c9-2b5bcb834ca0" config-ref="DATA_BLIND_Config"  tweak="#[vars.tweak]" >
 			<zt:sensitive-json ><![CDATA[#[write(payload.SensitiveJSON, 'application/json')]]]></zt:sensitive-json>
 		</zt:encrypt-json-using-nlp>
-		<ee:transform doc:name="Transform Message" doc:id="4629b091-1740-41db-92a9-b016af2c0429">
+		<ee:transform doc:name="Transform Message1" doc:id="003d768f-2d24-4724-83fb-5c3c3d8a8845">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
+import * from dw::core::Strings
 output application/json
+
+var raw = payload.token
+var unquoted = raw replace /^"|"$/ with "" // Remove outer double quotes
+var cleaned = unquoted 
+replace "\\\\" with "\\" // Unescape backslashes 
+replace "\\\"" with "\"" // Unescape double quotes
+replace "\\n" with "\n" // Replace escaped new line characters with actual new line    
+replace /:\s*([0-9]+(\.[0-9]+)?)/ with (m) -> ": \"" ++ (m[1]) ++ "\"" // Convert all numbers to strings
 ---
-read(payload.token, 'application/json')]]></ee:set-payload>
+read(cleaned, "application/json")]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="9cee545b-c3f1-4457-a721-d91814ce2935" message='#["EncryptJsonNlp completed"]' />
@@ -53,9 +63,23 @@ read(payload.token, 'application/json')]]></ee:set-payload>
 	<flow name="reduceJSON" doc:id="995e2a6b-140a-41fd-85d4-6ec0e2ae5057" >
 		<http:listener doc:name="Listener" doc:id="63e97d6d-f75c-4838-a555-31f0fd354a76" config-ref="HTTP_Listener_config" path="/reduceJSON" />
 		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="0bcdc8dd-fc39-4283-9916-eccddb99a928" variableName="tweak" />
-		<zt:reduce-json doc:name="Reduce json" doc:id="cc92ee4c-3eb7-4072-8264-03924ec9625a" config-ref="DATA_BLIND_Config" sensitiveFields="#[payload.SensitiveFields]"  operation='#["retain"]'>
-			<zt:sensitive-json ><![CDATA[#[write(payload.SensitiveJSON, 'application/json')]]]></zt:sensitive-json>
-		</zt:reduce-json>
 		<logger level="INFO" doc:name="Logger" doc:id="7ecd2ac7-5c97-46bd-a341-eb622468a720" message='#["ReduceJson completed"]' />
+	</flow>
+	<flow name="blindCsv" doc:id="5c83e85f-128f-4682-bff2-1c5a3eecd565" >
+		<http:listener doc:name="Listener" doc:id="6f30a0b6-19d5-4e55-9609-193297e2db8d" config-ref="HTTP_Listener_config" path="/blindCsvFile" />
+		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="d4a6a17d-950f-497e-b329-2751803c5c79" variableName="tweak" />
+		<file:read doc:name="Read" doc:id="b3dd854e-9ee0-4cbe-a366-7c650f64b11f" path="/Users/ZTensor/Downloads/WorkSheet-1.csv" target="csvData"/>
+		<zt:encrypt-json doc:name="Encrypt json" doc:id="ed53ee48-75fb-47fb-994e-888992474742" config-ref="DATA_BLIND_Config" sensitiveFields="#[write(payload.SensitiveFields, 'application/json')]" tweak="#[vars.tweak]" >
+			<zt:sensitive-json ><![CDATA[#[write(vars.csvData, 'application/json')]]]></zt:sensitive-json>
+		</zt:encrypt-json>
+		<ee:transform doc:name="Transform Message" doc:id="12c3a5d2-f823-474e-8744-176f336d2d06">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/csv
+---
+(payload map ((item) -> item - "EMPLOYEE_VENDOR_CTO_USE_ONLY_FLAG")) map ((item) -> item - "CUSTOMER_PURGE_DATE_FLAG")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="48f3acaa-da0c-4fcd-809a-def9c0ae9505" message='#["EncryptJson completed"]' />
 	</flow>
 </mule>
