@@ -10,7 +10,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 	<flow name="blindJSON" doc:id="37cb1b0f-4957-4fc4-b989-96aa55c02392" >
 		<http:listener doc:name="Listener" doc:id="075ebd7d-1595-457d-9e35-bd9aea6c0c4b" config-ref="HTTP_Listener_config" path="/blindJSON"/>
 		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="efc09481-f20b-4732-9ec1-bcff715cf175" variableName="tweak" />
-		<zt:encrypt-json doc:name="Encrypt json" doc:id="7af78e76-4b17-482e-9a00-5f65b044986b" config-ref="DATA_BLIND_Config" sensitiveFields="#[write(payload.SensitiveFields, 'application/json')]" tweak="#[vars.tweak]">
+		<zt:encrypt-json doc:name="Encrypt json" doc:id="7af78e76-4b17-482e-9a00-5f65b044986b" sensitiveFields="#[write(payload.SensitiveFields, 'application/json')]" tweak="#[vars.tweak]" config-ref="DATA_BLIND_Config" passPhrase="#[attributes.headers.'tokenPassPhrase']" overRideToken="#[attributes.headers.'overRideToken']">
 			<zt:sensitive-json><![CDATA[#[payload.SensitiveJSON]]]></zt:sensitive-json>
 		</zt:encrypt-json>
 		<logger level="INFO" doc:name="Logger" doc:id="d9f9640c-b157-4764-a274-8d5e20d88975" message='#["EncryptJson completed"]'/>
@@ -18,7 +18,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 	<flow name="blindJSON_nlp" doc:id="7f849601-a0d8-418b-a038-69637a004302" >
 		<http:listener doc:name="Listener" doc:id="4036895f-8dbf-4b6c-8d6e-05f5a64a88b5" config-ref="HTTP_Listener_config" path="/blindJSON_nlp" />
 		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="2a28e750-13e0-4206-8679-2bee7ac7d187" variableName="tweak" />
-		<zt:encrypt-json-using-nlp doc:name="Encrypt json using nlp" doc:id="169ae518-5bf9-4580-b7c9-2b5bcb834ca0" config-ref="DATA_BLIND_Config"  tweak="#[vars.tweak]" >
+		<zt:encrypt-json-using-nlp doc:name="Encrypt json using nlp" doc:id="169ae518-5bf9-4580-b7c9-2b5bcb834ca0" tweak="#[vars.tweak]" config-ref="DATA_BLIND_Config" passPhrase="#[attributes.headers.'tokenPassPhrase']" overRideToken="206402122003242eb4cac5599e048e98c49fa5b787d9b8d2fb7333d30c4460411d63e780da01ee">
 			<zt:sensitive-json ><![CDATA[#[write(payload.SensitiveJSON, 'application/json')]]]></zt:sensitive-json>
 		</zt:encrypt-json-using-nlp>
 		<ee:transform doc:name="Transform Message1" doc:id="003d768f-2d24-4724-83fb-5c3c3d8a8845">
@@ -43,15 +43,15 @@ read(cleaned, "application/json")]]></ee:set-payload>
 	<flow name="clearJSON" doc:id="5a84c642-2b1a-4aa1-a63b-931f7e70f272" >
 		<http:listener doc:name="Listener" doc:id="ecffaf8f-2cc8-442c-888b-bd16d4dbc01a" config-ref="HTTP_Listener_config" path="/clearJSON" />
 		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="6d0a0ec6-e418-4b77-8e93-73b648d9a0d2" variableName="tweak" />
-		<zt:decrypt-json doc:name="Decrypt json" doc:id="a2b06d78-e2cb-4f0a-99eb-a9f49fce328c" config-ref="DATA_BLIND_Config" sensitiveFields="#[write(payload.SensitiveFields, 'application/json')]"  tweak="#[vars.tweak]">
-			<zt:encrypted-json ><![CDATA[#[write(payload.SensitiveJSON, 'application/json')]]]></zt:encrypted-json>
+		<zt:decrypt-json doc:name="Decrypt json" doc:id="a2b06d78-e2cb-4f0a-99eb-a9f49fce328c" sensitiveFields="#[write(payload.SensitiveFields, 'application/json')]"  tweak="#[vars.tweak]" config-ref="DATA_BLIND_Config" overRideToken="#[attributes.headers.'overRideToken']" passPhrase="#[attributes.headers.'tokenPassPhrase']">
+			<zt:encrypted-json ><![CDATA[#[payload.SensitiveJSON]]]></zt:encrypted-json>
 		</zt:decrypt-json>
 		<logger level="INFO" doc:name="Logger" doc:id="e0881cfa-14b4-40f3-818d-0473fd42e1be" message='#["DecryptJson completed"]' />
 	</flow>
 	<flow name="createToken" doc:id="f0f5224f-9abf-4d33-ba6d-f2746470660f" >
 		<http:listener doc:name="Listener" doc:id="3028a779-b6af-416d-ad72-1b94eea987d4" config-ref="HTTP_Listener_config" path="/createToken" />
 		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="09c28e27-640c-4c40-9c8d-c356fcf662d7" variableName="tweak" />
-		<zt:override-token doc:name="Override token" doc:id="e760f035-844a-4325-8d24-9d28d8aebf14" config-ref="DATA_BLIND_Config" passPhrase="#[payload.passPhrase]" expirationSecs="#[payload.expirationSeconds]"/>
+		<zt:override-token doc:name="Override token" doc:id="e760f035-844a-4325-8d24-9d28d8aebf14" passPhrase="#[payload.passPhrase]" expirationSecs="#[payload.expirationSeconds]" config-ref="DATA_BLIND_Config"/>
 		<logger level="INFO" doc:name="Logger" doc:id="f2596b1e-7c39-4a34-a113-ade8acafe754" message='#["OverRideToken completed"]' />
 	</flow>
 	<flow name="createTokenWithKey" doc:id="7b997c2d-abcf-48a3-a9ff-7556274c8e6d" >
@@ -63,13 +63,16 @@ read(cleaned, "application/json")]]></ee:set-payload>
 	<flow name="reduceJSON" doc:id="995e2a6b-140a-41fd-85d4-6ec0e2ae5057" >
 		<http:listener doc:name="Listener" doc:id="63e97d6d-f75c-4838-a555-31f0fd354a76" config-ref="HTTP_Listener_config" path="/reduceJSON" />
 		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="0bcdc8dd-fc39-4283-9916-eccddb99a928" variableName="tweak" />
+		<zt:reduce-json doc:name="Reduce json" doc:id="558b7793-83da-4b98-8662-da8b5f3499bd" config-ref="DATA_BLIND_Config" sensitiveFields="#[payload.SensitiveFields]" operation='#["remove"]' overRideToken="#[attributes.headers.'overRideToken']" passPhrase="#[attributes.headers.'tokenPassPhrase']">
+			<zt:sensitive-json ><![CDATA[#[payload.SensitiveJSON]]]></zt:sensitive-json>
+		</zt:reduce-json>
 		<logger level="INFO" doc:name="Logger" doc:id="7ecd2ac7-5c97-46bd-a341-eb622468a720" message='#["ReduceJson completed"]' />
 	</flow>
 	<flow name="blindCsv" doc:id="5c83e85f-128f-4682-bff2-1c5a3eecd565" >
 		<http:listener doc:name="Listener" doc:id="6f30a0b6-19d5-4e55-9609-193297e2db8d" config-ref="HTTP_Listener_config" path="/blindCsvFile" />
 		<set-variable value='#["12345"]' doc:name="Tweak" doc:id="d4a6a17d-950f-497e-b329-2751803c5c79" variableName="tweak" />
 		<file:read doc:name="Read" doc:id="b3dd854e-9ee0-4cbe-a366-7c650f64b11f" path="/Users/ZTensor/Downloads/WorkSheet-1.csv" target="csvData"/>
-		<zt:encrypt-json doc:name="Encrypt json" doc:id="ed53ee48-75fb-47fb-994e-888992474742" config-ref="DATA_BLIND_Config" sensitiveFields="#[write(payload.SensitiveFields, 'application/json')]" tweak="#[vars.tweak]" >
+		<zt:encrypt-json doc:name="Encrypt json" doc:id="ed53ee48-75fb-47fb-994e-888992474742" sensitiveFields="#[write(payload.SensitiveFields, 'application/json')]" tweak="#[vars.tweak]" config-ref="DATA_BLIND_Config">
 			<zt:sensitive-json ><![CDATA[#[write(vars.csvData, 'application/json')]]]></zt:sensitive-json>
 		</zt:encrypt-json>
 		<ee:transform doc:name="Transform Message" doc:id="12c3a5d2-f823-474e-8744-176f336d2d06">

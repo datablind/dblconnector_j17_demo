@@ -34,19 +34,24 @@
 				<configuration>
 					<additionalPluginDependencies>
 						<plugin>
-							<groupId>${datablind.exchange.groupId}</groupId>
+							<!-- <groupId>${datablind.exchange.groupId}</groupId>-->
+							<groupId>org.ztensor.connectors</groupId>
 							<artifactId>mule-datablind-connector</artifactId>
 							<additionalDependencies>
 								<dependency>
 									<groupId>com.ztensor</groupId>
-									<artifactId>datacrypt</artifactId>
-									<version>3.0.5</version>
+									<artifactId>datacrypt-release</artifactId>
+									<version>3.0.8</version>
 								</dependency>
 							</additionalDependencies>
 						</plugin>
 					</additionalPluginDependencies>
 					<classifier>mule-application</classifier>
 					<sharedLibraries>
+						<sharedLibrary>
+							<groupId>com.ztensor</groupId>
+							<artifactId>datacrypt-release</artifactId>
+						</sharedLibrary>
 						<sharedLibrary>
 							<groupId>com.ztensor</groupId>
 							<artifactId>datacrypt</artifactId>
@@ -87,12 +92,13 @@
 			<version>1.2.6</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
-		<dependency>
+		<!-- 		<dependency>
 			<groupId>${datablind.exchange.groupId}</groupId>
 			<artifactId>mule-datablind-connector</artifactId>
 			<version>5.0.12</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
+ -->
 		<dependency>
 			<groupId>com.mulesoft.munit</groupId>
 			<artifactId>munit-runner</artifactId>
@@ -115,12 +121,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mule.connectors</groupId>
-			<artifactId>mule-file-connector</artifactId>
-			<version>1.5.2</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.connectors</groupId>
 			<artifactId>mule-http-connector</artifactId>
 			<version>1.10.3</version>
 			<classifier>mule-plugin</classifier>
@@ -133,8 +133,32 @@
 		</dependency>
 		<dependency>
 			<groupId>com.ztensor</groupId>
-			<artifactId>datacrypt</artifactId>
-			<version>3.0.5</version>
+			<artifactId>datacrypt-release</artifactId>
+			<version>3.0.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ztensor.connectors</groupId>
+			<artifactId>mule-datablind-connector</artifactId>
+			<version>5.0.20</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-file-connector</artifactId>
+			<version>1.5.3</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-file-extension-common</artifactId>
+			<version>1.4.3</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.connectors</groupId>
+			<artifactId>mule-sharepoint-connector</artifactId>
+			<version>3.8.0</version>
+			<classifier>mule-plugin</classifier>
 		</dependency>
 	</dependencies>
 
@@ -168,10 +192,11 @@
 				   <url>https://repository.mulesoft.org/nexus-ee/content/repositories/releases-ee/</url>
 		</repository>
 -->
+
 		<repository>
-			<id>cwrepo</id>
+			<id>datablindrepo</id>
 			<name>GitHub OWNER Apache Maven Packages</name>
-			<url>https://maven.pkg.github.com/datablind/datacrypt</url>
+			<url>https://maven.pkg.github.com/datablind/datacrypt-release</url>
 		</repository>
 		<repository>
 			<id>anypoint-exchange-v3</id>

@@ -9,7 +9,9 @@ http://www.mulesoft.org/schema/mule/zt http://www.mulesoft.org/schema/mule/zt/cu
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="90e14786-fd0f-4e1b-8b95-a4918dbc11a3" basePath="/" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
-	<zt:config name="DATA_BLIND_Config" doc:name="DATA BLIND Config" doc:id="04761b7b-aa36-42e4-a937-f41345e98c58" encryptionKey='#["1234567812345678"]'>
-		<zt:connection apiUri="https://kwoz0lfnn8.execute-api.us-west-1.amazonaws.com/Dev" apiKey="hyamCMB55o36G1J0fUXm63I5h3qBmcGl8UZKvLQZ"/>
+	<zt:config name="DATA_BLIND_Config" doc:name="DATA BLIND Config" doc:id="28f790f0-19a2-4a42-bc91-4200c9e37692" encryptionKey="1234567812345678" >
+		<zt:connection apiUri="https://kwoz0lfnn8.execute-api.us-west-1.amazonaws.com/Dev" apiKey="hyamCMB55o36G1J0fUXm63I5h3qBmcGl8UZKvLQZ" proxyHost="localhost" proxyUsername="proxyuser" proxyPassword="password" proxyPort="3128"/>
 	</zt:config>
 </mule>
+
+
